@@ -1,0 +1,16 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+
+}
+
+
+<form id="ImgForm" method="POST" enctype="multipart/form-data" name="ImgForm" action="/FileUpload/SubmitForm">
+    <input type="file" name="fileData">
+    <br />
+    <input type="text" name="name" />
+    <br />
+    <input type="password" name="password" />
+    <br />
+    <input type="submit" value="上传" />
+</form>

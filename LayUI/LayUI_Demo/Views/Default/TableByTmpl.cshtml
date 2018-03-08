@@ -1,0 +1,150 @@
+﻿
+@{
+    ViewBag.Title = "TableByTmpl";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Index</title>
+    <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+    <div class="panel animated fadeIn">
+        <div class="panel-body">
+            <div class="demoTable">
+                搜索ID：
+                <div class="layui-inline">
+                    <input class="layui-input" name="id" id="demoReload" autocomplete="off" style="height:30px">
+                </div>
+                <button class="layui-btn layui-btn-sm" id="btnSearch">搜索</button>
+                <button class="layui-btn layui-btn-sm" id="btnAdd">新增</button>
+            </div>
+            <table id="gridList" class="layui-form layui-table elight-table" lay-skin="row">
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" lay-skin="primary">
+                        </th>
+                        <th>创建时间</th>
+                        <th>标题</th>
+                        <th>图片</th>
+                        <th>简述</th>
+                        <th>集数</th>
+                        <th>访问量</th>
+                    </tr>
+                </thead>
+                <!--内容容器-->
+                <tbody id="content"></tbody>
+            </table>
+            <div id="paged"></div>
+        </div>
+    </div>
+</body>
+</html>
+<!--内容模板-->
+<script id="contentTpl" type="text/html">
+    {{#  layui.each(d.data, function(index, item){ }}
+    <tr>
+        <td>
+            <input type="checkbox" lay-skin="primary" value="{{item.id}}">
+        </td>
+        <td>{{item.createtime}}</td>
+        <td>{{item.title}}</td>
+        <td>{{item.img}}</td>
+        <td>{{item.body}}</td>
+        <td>集数</td>
+        <td>{{item.visitnum}}</td>
+    </tr>
+    {{#  }); }}
+    {{# if(d.data.length<=0) { }}
+    <tr style="color: red">
+        <td colspan="10">查无数据。</td>
+    </tr>
+    {{# } }}
+</script>
+
+<script type="text/javascript">
+   
+    layui.use(['form', 'layer', 'table', 'jquery', 'laytpl', 'laypage'], function () {
+        var form = layui.form,
+            layer = parent.layer === undefined ? layui.layer : parent.layer,
+            laypage = layui.laypage,
+            table = layui.table,
+            laytpl = layui.laytpl;
+        $ = layui.jquery;
+
+        initGrid(1,10,"");
+
+        function initGrid(page,limit, keyWord) {
+            //加载页面数据
+            var pagecount = 0;
+            $.ajax({
+                type: "post",
+                url: "/Default/TableByTmpl",
+                async:false,
+                data: { limit: limit, page: page, keyWord: keyWord },
+                success: function (data) {
+                    pagecount = data.count;
+                    var gettpl = document.getElementById('contentTpl').innerHTML;   //获取拼接部分的内容
+                    laytpl(gettpl).render(eval(data), function (html) {       //給拼接的模板绑定数据
+                        document.getElementById('content').innerHTML = html;    // 吧生成的结构绑定在负责呈现内容的div中。
+                        
+                    });
+                    //分页
+                    laypage.render({
+                        elem: 'paged', //注意，这里的 test1 是 ID，不用加 # 号
+                        theme: 'yahei',  //当前页的颜色
+                        count: pagecount, //数据总数，从服务端得到
+                        curr: page, //获取起始页
+                        layout: ['count', 'prev', 'page', 'next', 'skip'],
+                        jump: function (obj, first) {
+                            if (!first) {//点击跳页触发函数自身，并传递当前页：obj.curr
+                                initGrid(obj.curr, obj.limit, keyWord);
+                            }
+                        }
+                    });
+                    
+                    form.render();
+                }
+            });
+        }
+
+        $("#chkall").click(function () {
+            if ($(this).prop("checked") == true) {
+                $(".chkitem").prop("checked", true);
+            } else {
+                $(".chkitem").prop("checked", false);
+            }
+        });
+        function delmore() {
+            if (confirm("是否确认删除所选项？")) {
+                var str = "";
+                $(".chkitem").each(function (i) {
+                    if ($(this).prop("checked") == true) {
+                        str += $(this).val() + ",";
+                    }
+                })
+                var url = "/Default/Delete?ids=" + str;
+                $.get(url, function (data) {
+                    alert(data);
+                    location.reload();
+                })
+            }
+
+        }
+        function delone(id) {
+            if (confirm("是否确认删除？")) {
+                var url = "/Default/Delete?ids=" + id;
+                $.get(url, function (data) {
+                    alert(data);
+                    location.reload();
+                })
+            }
+        }
+    });
+</script>
+
+
+

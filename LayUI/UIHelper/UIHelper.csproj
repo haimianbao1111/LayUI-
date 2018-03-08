@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{10F4770D-826F-4E44-A4F2-F46665FF8305}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>UIHelper</RootNamespace>
+    <AssemblyName>UIHelper</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Aspose.Words, Version=11.3.0.0, Culture=neutral, PublicKeyToken=47d5d0e1ef9d080b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Lib\Aspose.Words.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Lib\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI, Version=1.2.3.0, Culture=neutral, PublicKeyToken=0df73ec7942b34e1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Lib\NPOI.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Extension\ExtDateTime.cs" />
+    <Compile Include="Extension\ExtString.cs" />
+    <Compile Include="File\Configs.cs" />
+    <Compile Include="File\FileUtil.cs" />
+    <Compile Include="File\PicToBase64.cs" />
+    <Compile Include="Format\ConvertHelper.cs" />
+    <Compile Include="Format\EnumHelper.cs" />
+    <Compile Include="Format\JsonHelper.cs" />
+    <Compile Include="Form\RequestToModel.cs" />
+    <Compile Include="HttpClientPost\HttpClientHelper.cs" />
+    <Compile Include="HttpClientPost\MsMultiPartFormData.cs" />
+    <Compile Include="HttpClientPost\PostDataServer.cs" />
+    <Compile Include="Operator\OperatorProvider.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Security\Encrypt.cs" />
+    <Compile Include="Security\VerifyCode.cs" />
+    <Compile Include="Tool\DataTableRenderToExcel.cs" />
+    <Compile Include="Tool\HttpHelper.cs" />
+    <Compile Include="Tool\HttpItem.cs" />
+    <Compile Include="Tool\HttpResult.cs" />
+    <Compile Include="Tool\IPSearch.cs" />
+    <Compile Include="Tool\PostDataType.cs" />
+    <Compile Include="Tool\ResultCookieType.cs" />
+    <Compile Include="Tool\StrToPinyin.cs" />
+    <Compile Include="Tool\Tool.cs" />
+    <Compile Include="Tool\Totp.cs" />
+    <Compile Include="Tool\TypeChange.cs" />
+    <Compile Include="Web\FileClass.cs" />
+    <Compile Include="Web\Keys.cs" />
+    <Compile Include="Web\ReplaceAndInsertImage.cs" />
+    <Compile Include="Web\WebHelper.cs" />
+    <Compile Include="Web\WordToHtml.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Model\Model.csproj">
+      <Project>{FF7FEC66-663D-4552-85F7-7D590FB852F6}</Project>
+      <Name>Model</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Lib\Aspose.Cells.dll" />
+    <Content Include="Lib\Aspose.Words.dll" />
+    <Content Include="Lib\Ionic.Zip.dll" />
+    <Content Include="Lib\LitJSON.dll" />
+    <Content Include="Lib\log4net.dll" />
+    <Content Include="Lib\Newtonsoft.Json.dll" />
+    <Content Include="Lib\NPOI.dll" />
+    <Content Include="Lib\ThoughtWorks.QRCode.dll" />
+    <Content Include="Lib\URLRewriter.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="OnlineEdit\ListJson.doc" />
+    <None Include="OnlineEdit\PageOffice.rar" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,143 @@
+﻿
+@{
+    Layout = null;
+}
+
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+
+<style>
+    #FileContent { width: 500px; height: 450px; border: 1px solid gray; overflow: hidden; overflow-y: auto; }
+    #FileContent .file { width: 100%; height: 50px; line-height: 50px; border-bottom: 1px solid #dedede; font-size: 13px; }
+    #FileContent .file .name { width: 50%; height: 100%; text-indent: 10px; float: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #FileContent .file .size { width: 25%; height: 100%; text-align: center; float: left; }
+    #FileContent .file .status { width: 25%; height: 100%; text-align: center; float: left; color: blue; color: gray; }
+    #FileContent .file .status.ok { color: green; }
+    #FileContent .file .status.error { color: red; }
+    #FileContent .file .status.loading { color: blue; }
+</style>
+<input type='file' name="file" id="file" multiple="multiple" />
+<div id="FileContent">
+    @*<div class="file">
+            <span class="name">QQ截图20170426140537.jpgQQ截图20170426140537.jpg</span>
+            <span class="size">20M</span>
+            <span class="status">上传中…</span>
+        </div>*@
+</div>
+<script type="text/javascript">
+
+    //上传设置
+    var fileConfig = {
+        //生成唯一标识码
+        guid: (function () {
+            var counter = 0;
+
+            return function (prefix) {
+                var guid = (+new Date()).toString(32),
+                    i = 0;
+
+                for (; i < 5; i++) {
+                    guid += Math.floor(Math.random() * 65535).toString(32);
+                }
+
+                return (prefix || 'wu_') + guid + (counter++).toString(32);
+            };
+        })(),
+        chunkSize: 1024 * 1024,//每次上传的字节大小  默认1M
+        maxSize: 1024 * 1024 * 100//最大上传大小  默认100M
+
+    };
+
+    /*
+        上传文件
+        file:选择的文件
+        chunk:当前分段
+        maxChunk:最大分段数
+        guid:唯一标识码
+    */
+    function FileUp(file,chunk,maxChunk,guid) {
+        var formData = new FormData();
+        //将文件进行分段
+        formData.append('file', file.slice(chunk * fileConfig.chunkSize, (chunk + 1) * fileConfig.chunkSize));
+        formData.append('name', file.name);
+        formData.append('chunk', chunk);
+        formData.append('maxChunk', maxChunk);
+        formData.append('guid', guid);
+        $.ajax({
+            url: "/Home/Upload/",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            //async: false,
+            beforeSend: function () {
+                //上传进度条
+                $("#FileContent .file-" + guid).find(".status").addClass("loading");
+                var now = (chunk / maxChunk * 100).toFixed(2);
+                $("#FileContent .file-" + guid).find(".status").text(now + "%");
+                
+            },
+            success: function (data) {
+                $("#FileContent .file-" + guid).find(".status").removeClass("loading");
+                //上传完成
+                if (data.msg == "ok") {
+                    $("#FileContent .file-" + guid).find(".status").text("上传成功");
+                    $("#FileContent .file-" + guid).find(".status").addClass("ok");
+                }
+                //下一个分段
+                else if (data.msg == "next") {
+                    
+                    FileUp(file, ++chunk, maxChunk, guid);
+                }
+                else {
+                    $("#FileContent .file-" + guid).find(".status").text("上传失败");
+                    $("#FileContent .file-" + guid).find(".status").addClass("error");
+                }
+            },
+            error: function () {
+                $("#FileContent .file-" + guid).find(".status").removeClass("loading");
+                $("#FileContent .file-" + guid).find(".status").text("上传失败");
+                $("#FileContent .file-" + guid).find(".status").addClass("error");
+            }
+        });
+    }
+
+ 
+    $(function () {
+        $("#file").change(function () {
+
+            var files = $(this).get(0).files;
+            var times = [];
+            for (var i = 0; i < files.length; i++) {
+                var guid = fileConfig.guid();
+                var time = new Date().getTime() + "-" + Math.floor(Math.random() * 10000);
+                var div = "<div class='file file-" + guid + "'><span class='name'>" + files[i].name + "</span><span class='size'>" + getFileSize(files[i].size) + "</span><span class='status'>等待上传</span></div>";
+                $("#FileContent").append(div);
+                times.push(guid);
+            }
+
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                //计算分段数
+                var maxChunk = Math.ceil((file.size / fileConfig.chunkSize));
+                $("#FileContent .file-" + times[i]).find(".status").text("0%");
+                $("#FileContent .file-" + times[i]).find(".status").addClass("loading");
+                FileUp(file, 0, maxChunk, times[i]);
+                
+            }
+        })
+    })
+
+    function getFileSize(v) {
+        console.log(v);
+        var s = "";
+        if (v < 1024 * 1024)
+            s = (v / 1024).toFixed(2) + "KB";
+        else if (v < 1024 * 1024 * 1024)
+            s = (v / 1024 / 1024).toFixed(2) + "MB";
+        else
+            s = (v / 1024 / 1024 / 1024).toFixed(2) + "GB";
+
+        return s;
+
+    }
+</script>

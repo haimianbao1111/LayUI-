@@ -1,0 +1,116 @@
+﻿@{
+    ViewBag.Title = "LayUI—Demo";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>layui在线调试</title>
+</head>
+<body>
+    <div style="margin-top:30px;align-items:center">
+        <a class="layui-btn layui-btn-sm" id="TableByRender">TableByRender</a>
+        <a class="layui-btn layui-btn-sm" id="TableByTmpl">TableByTmpl</a>
+        <a class="layui-btn layui-btn-sm" id="TableByJson">TableByJson</a>
+        <a class="layui-btn layui-btn-sm" id="TableByChaJ">TableByChaJ</a>
+    </div>
+
+    <div style="margin-top:30px;align-items:center">
+        <a class="layui-btn layui-btn-sm" id="WebUploaderDemo">WebUploaderDemo</a>
+        <a class="layui-btn layui-btn-sm" id="UploadFile">上传文件</a>
+        <a class="layui-btn layui-btn-sm" id="DownloadFile">下载文件</a>
+    </div>
+
+</body>
+</html>
+<script>
+    layui.use(['layer', 'form'], function () {
+        var layer = layui.layer //弹层
+        , form = layui.form; //表单渲染
+        var $ = layui.jquery;
+        
+        layer.config({
+            extend: '../../../MySkin/style.css', //加载您的扩展样式
+            skin: 'layer-ext-yourskin'
+        });
+
+        $('#TableByRender').on('click', function () {
+            var index = layer.open({
+                type: 2,
+                content: '/Default/TableByRender'
+            });
+            layer.full(index);
+        });
+
+        $('#TableByTmpl').on('click', function () {
+            var index = layer.open({
+                type: 2,
+                content: '/Default/TableByTmpl'
+            });
+            layer.full(index);
+        })
+
+        $('#TableByJson').on('click', function () {
+            var index = layer.open({
+                type: 2,
+                content: '/Default/TableByJson'
+            });
+            layer.full(index);
+        })
+
+        $('#TableByChaJ').on('click', function () {
+            var index = layer.open({
+                type: 2,
+                content: '/Default/TableByChaJ'
+            });
+            layer.full(index);
+        })
+
+        $('#WebUploaderDemo').on('click', function () {
+            var index = layer.open({
+                type: 2,
+                content: '/SaveFiles/Index'
+            });
+            layer.full(index);
+        })
+
+        $('#UploadFile').on('click', function () {
+            var index = layer.open({
+                type: 2,
+                content: '/UploadFile/Index'
+            });
+            layer.full(index);
+        })
+
+        $('#DownloadFile').on('click', function () {
+            var index = layer.open({
+                type: 2,
+                content: '/DownloadFile/Index'
+            });
+            layer.full(index);
+        })
+
+
+        //格式日期
+        function formatDate(NewDtime) {
+            var dt = new Date(parseInt(NewDtime.slice(6, 19)));
+            var year = dt.getFullYear();
+            var month = dt.getMonth() + 1;
+            var date = dt.getDate();
+            var hour = dt.getHours();
+            var minute = dt.getMinutes();
+            var second = dt.getSeconds();
+            return year + "-" + month + "-" + date;
+        }
+        String.prototype.format = String.prototype.f = function () {
+            var s = this,
+                i = arguments.length;
+            while (i--) {
+                s = s.replace(new RegExp('\\{' + i + '\\}', 'gm'), arguments[i]);
+            }
+            return s;
+        };
+    })
+</script>

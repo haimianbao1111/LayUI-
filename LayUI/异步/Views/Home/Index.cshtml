@@ -1,0 +1,36 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = null;
+}
+<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+
+<div style="margin:10px;">
+    <button class="btn btn-primary" id="btntest">异步处理</button>
+
+    <button class="btn btn-primary" id="btntest1">同步处理</button>
+</div>
+
+<script>
+    $("#btntest").click(function () { 
+        $.ajax({
+            url: '/Home/GetY',
+            type: 'get',
+            success: function (res) {
+                console.log(res);
+            }
+        })
+    })
+    $("#btntest1").click(function () {
+        $.ajax({
+            url: '/Home/GetT',
+            type: 'get',
+            success: function (res) {
+                console.log(res);
+            }
+        })
+    })
+</script>
+

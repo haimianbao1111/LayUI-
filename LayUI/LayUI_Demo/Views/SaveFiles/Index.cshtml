@@ -1,0 +1,189 @@
+﻿
+@{
+    ViewBag.Title = " 保存";
+}
+
+
+<style type="text/css">
+    div.content {
+        border: 1px dashed #0094ff;
+        margin: 15px;
+        padding: 15px;
+    }
+</style>
+<div class="row">
+    <div class="content">
+        <div>
+            <ul>
+                <li> 1、需要post提交</li>
+                <li> 2、enctype="multipart/form-data" （传输文件）</li>
+                <li> 3、需要提交的表单元素需要设置 name 属性</li>
+            </ul>
+        </div>
+        <form action="/SaveFiles/SaveFile1" method="post" enctype="multipart/form-data">
+            <input type="file" name="file1" />
+            <button type="submit" class="but1">上传1</button>
+        </form>
+    </div>
+    <div class="content">
+        <div>利用jquery.form.min</div>
+        <form id="form2" action="/SaveFiles/SaveFile2" method="post" enctype="multipart/form-data">
+            <input type="file" name="file1" />
+            <button type="submit" class="but1">上传2</button>
+            <button type="button" class="but2">上传3</button>
+        </form>
+    </div>
+    <div class="content">
+        <input id="fileinfo" type="file" class="notFormFile" />
+        <button type="button" class="btnNotForm">上传4</button>
+    </div>
+    <div class="content">
+        <input type="file" id="file5">
+        <button type="button" class="btnFile5">上传5</button>
+    </div>
+
+    <div class="content">
+        <input type="file" id="file6" multiple>
+        <button type="button" class="btnFile6">分片上传6</button>
+        <div class="result"></div>
+    </div>
+    <div class="content">
+        <textarea class="divFile7" style="min-width:800px;height:150px" placeholder="请将文件拖拽或直接粘贴到这里"></textarea>
+    </div>
+</div>
+@section scripts{
+    <script src="~/Scripts/jquery.form.js"></script>
+    <script type="text/javascript">
+        //方式1
+        //直接点击submit提交
+
+        //方式2
+        $(function () {
+            $('#form2').ajaxForm({
+                success: function (responseText) {
+                    alert(responseText);
+                }
+            });
+        });
+
+        //方式3
+        $(function () {
+            $(".but2").click(function () {
+                $('#form2').ajaxSubmit({
+                    success: function (responseText) {
+                        alert(responseText);
+                    }
+                });
+            });
+        });
+
+        //方式4
+        $(".btnNotForm").click(function () {
+            var formData = new FormData();//初始化一个FormData对象
+            formData.append("files", $(".notFormFile")[0].files[0]);//将文件塞入FormData
+            $.ajax({
+                url: "/SaveFiles/SaveFile2",
+                type: "POST",
+                data: formData,
+                processData: false,  // 告诉jQuery不要去处理发送的数据
+                contentType: false,   // 告诉jQuery不要去设置Content-Type请求头
+                success: function (responseText) {
+                    alert(responseText);
+                }
+            });
+        });
+
+        //方式5
+        $(".btnFile5").click(function () {
+            $.ajax({
+                url: "/SaveFiles/SaveFile4",
+                type: "POST",
+                data: $("#file5")[0].files[0],
+                processData: false,  // 告诉jQuery不要去处理发送的数据
+                contentType: false,   // 告诉jQuery不要去设置Content-Type请求头
+                success: function (responseText) {
+                    alert(responseText);
+                }
+            });
+        });
+
+        //方式6(分片上传)
+        $(".btnFile6").click(function () {
+            var upload = function (file, skip) {
+                var formData = new FormData();//初始化一个FormData对象
+                var blockSize = 1000000;//每块的大小
+                var nextSize = Math.min((skip + 1) * blockSize, file.size);//读取到结束位置
+                var fileData = file.slice(skip * blockSize, nextSize);//截取 部分文件 块
+                formData.append("file", fileData);//将 部分文件 塞入FormData
+                formData.append("fileName", file.name);//保存文件名字
+                $.ajax({
+                    url: "/SaveFiles/SaveFile6",
+                    type: "POST",
+                    data: formData,
+                    processData: false,  // 告诉jQuery不要去处理发送的数据
+                    contentType: false,   // 告诉jQuery不要去设置Content-Type请求头
+                    success: function (responseText) {
+                        $(".result").html("已经上传了" + (skip + 1) + "块文件");
+                        if (file.size <= nextSize) {//如果上传完成，则跳出继续上传
+                            alert("上传完成");
+                            return;
+                        }
+                        upload(file, ++skip);//递归调用
+                    }
+                });
+            };
+
+            var file = $("#file6")[0].files[0];
+            upload(file, 0);
+        });
+
+        //方式7(拖拽)
+        $(".divFile7")[0].ondrop = function (event) {
+
+            event.preventDefault();//不要执行与事件关联的默认动作
+            var files = event.dataTransfer.files;//获取拖上来的文件
+
+            //以下代码不变
+            var formData = new FormData();//初始化一个FormData对象
+            formData.append("files", files[0]);//将文件塞入FormData
+            $.ajax({
+                url: "/SaveFiles/SaveFile2",
+                type: "POST",
+                data: formData,
+                processData: false,  // 告诉jQuery不要去处理发送的数据
+                contentType: false,   // 告诉jQuery不要去设置Content-Type请求头
+                success: function (responseText) {
+                    $(".divFile7").val($(".divFile7").val() + "  " + files[0].name);
+                    alert(responseText);
+                }
+            });
+        };
+
+        //方式8(粘贴 限图片格式)
+        $(".divFile7")[0].onpaste = function (event) {
+            event.preventDefault();//不要执行与事件关联的默认动作
+            var clipboard = event.clipboardData.items[0];//剪贴板数据
+            if (clipboard.kind == 'file' || clipboard.type.indexOf('image') > -1) {//判断是图片格式
+                var imageFile = clipboard.getAsFile();//获取文件
+
+                //以下代码不变
+                var formData = new FormData;
+                formData.append('files', imageFile);
+                formData.append('fileName', "temp.png");//这里给文件命个名（或者直接在后台保存的时候命名）
+                $.ajax({
+                    url: "/SaveFiles/SaveFile8",
+                    type: "POST",
+                    data: formData,
+                    processData: false,  // 告诉jQuery不要去处理发送的数据
+                    contentType: false,   // 告诉jQuery不要去设置Content-Type请求头
+                    success: function (responseText) {
+                        $(".divFile7").val($(".divFile7").val() + "  temp.png");
+                        alert(responseText);
+                    }
+                });
+            }
+        };
+
+    </script>
+}
+

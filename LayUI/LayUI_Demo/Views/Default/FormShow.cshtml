@@ -1,0 +1,117 @@
+﻿
+@{
+    ViewBag.Title = "UpdateShow";
+    Layout = "~/Views/Shared/_FormLayout.cshtml";
+}
+<style>
+    img {
+        height: 150px;
+        width: 150px;
+    }
+</style>
+<link href="~/Content/webuploader/webuploader.css" rel="stylesheet" />
+<script src="~/Content/webuploader/webuploader.js"></script>
+
+<h2>https://www.cnblogs.com/jianghaidong/p/5583204.html</h2>
+
+<form id="form"  class="layui-form layui-form-pane" enctype="multipart/form-data">
+    <input type="hidden" name="id" />
+    <div class="layui-form-item">
+        <label class="layui-form-label">标题</label>
+        <div class="layui-input-block">
+            <input type="text" lay-verify="title" name="title" autocomplete="off" placeholder="请输入标题" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">创建日期</label>
+            <div class="layui-input-block">
+                <input type="text" name="createtime" id="date" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">浏览数量</label>
+            <div class="layui-input-inline">
+                <input type="text" lay-verify="required" name="visitnum" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-upload">
+        <div class="layui-upload-list">
+            <img class="layui-upload-img" id="img">
+        </div>
+    </div>
+
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">内容</label>
+        <div class="layui-input-block">
+            <textarea placeholder="请输入内容" name="body" id="bodytextarea" lay-filter="textarea" lay-verify="required" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item" style="display: none">
+        <button id="btnSubmit" class="layui-btn" lay-submit="" lay-filter="add">提交</button>
+    </div>
+</form>
+
+
+
+<script>
+
+    layui.use(['form', 'upload', 'laydate'], function () {
+        var form = layui.form
+        , upload = layui.upload
+        , laydate = layui.laydate;
+        //日期
+        laydate.render({
+            elem: '#date'
+        });
+
+        //自定义验证规则
+        form.verify({
+            title: function (value) {
+                if (value.length < 5) {
+                    return '标题至少得5个字符啊';
+                }
+            }
+        });
+
+        //序列化表单
+        var primaryKey = $.getQueryString("primaryKey");
+        if (primaryKey) {
+            $.ajax({
+                url: "/Default/GetForm",
+                data: { primaryKey: primaryKey },
+                type: "post",
+                dataType: "json",
+                async: false,
+                success: function (data) {
+                    $("#form").formSerialize(data);
+                    $("#img").attr("src", data.img);
+                }
+            });
+        }
+        form.render();
+        //表单上传图片
+        var uploadInst = upload.render({
+            elem: '#img'
+            , auto: false
+            , url: ''
+            , choose: function (obj) {
+                //预读本地文件示例，不支持ie8
+                obj.preview(function (index, file, result) {
+                    $('#img').attr('src', result); //图片链接（base64）
+                });
+            }
+        })
+        //监听提交
+        form.on('submit(add)', function (data) {
+            $.formSubmit({
+                url: "/Default/RequestSave",
+                data: data.field
+            });
+            return false;
+        });
+    });
+</script>
